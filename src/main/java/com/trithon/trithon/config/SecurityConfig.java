@@ -23,7 +23,7 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable()) // REST API에서 CSRF 보호 비활성화
                 .authorizeHttpRequests(authz -> authz
                         .requestMatchers("/auth/signup", "/auth/login", "/error").permitAll() // 회원가입과 로그인은 인증 없이 접근 가능
-                        .anyRequest().authenticated() // 그 외의 요청은 인증 필요
+                        .anyRequest().permitAll() // 그 외의 요청은 인증 필요, 일단은 모두 허용
                 )
                 .formLogin().disable() // 기본 로그인 폼 비활성화 (API 기반 인증 시)
                 .httpBasic().disable(); // 기본 HTTP 인증 비활성화
