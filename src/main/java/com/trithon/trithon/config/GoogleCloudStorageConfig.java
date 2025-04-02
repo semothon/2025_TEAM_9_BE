@@ -13,7 +13,7 @@ import java.io.IOException;
 @Configuration
 public class GoogleCloudStorageConfig {
 
-    @Value("${spring.cloud.gcp.storage.credentials.location}")
+    @Value("${GOOGLE_APPLICATION_CREDENTIALS}")
     private String jsonKeyPath;
 
     @Value("${spring.cloud.gcp.storage.project-id}")
