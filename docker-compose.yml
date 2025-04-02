@@ -1,0 +1,10 @@
+version: "3.8"
+services:
+  app:
+    build:
+      context: .
+      args:
+        JAR_FILE: ${JAR_FILE}  # .env에서 가져오기
+        AUTHOR: ${AUTHOR}       # .env에서 가져오기
+    env_file:
+      - .env  # .env 파일을 로드
