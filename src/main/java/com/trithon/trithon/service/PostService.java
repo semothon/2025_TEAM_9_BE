@@ -34,23 +34,25 @@ public class PostService {
     }
 
     public void createPost(PostRequestDto dto) {
-        String uuid = UUID.randomUUID().toString(); // Google Cloud Storage에 저장될 파일 이름
-        String ext = dto.getImage().getContentType(); // 파일의 형식 ex) JPG
         String imageUrl = null;
 
         // GCP에 이미지 업로드 (확장자 없이 저장)
-        try {
-            storage.create(
-                    BlobInfo.newBuilder(bucketName, uuid)
-                            .setContentType(ext) // MIME 타입 설정
-                            .build(),
-                    dto.getImage().getInputStream()
-            );
+        if (dto.getImage() != null && !dto.getImage().isEmpty()) {
+            String uuid = UUID.randomUUID().toString();
+            String ext = dto.getImage().getContentType();
+            try {
+                storage.create(
+                        BlobInfo.newBuilder(bucketName, uuid)
+                                .setContentType(ext) // MIME 타입 설정
+                                .build(),
+                        dto.getImage().getInputStream()
+                );
 
-            imageUrl = String.format("https://storage.googleapis.com/%s/%s", bucketName, uuid);
-        } catch (IOException e) {
-            e.printStackTrace();
-            throw new RuntimeException("Failed to upload image", e);
+                imageUrl = String.format("https://storage.googleapis.com/%s/%s", bucketName, uuid);
+            } catch (IOException e) {
+                e.printStackTrace();
+                throw new RuntimeException("Failed to upload image", e);
+            }
         }
 
         // 게시글 저장
