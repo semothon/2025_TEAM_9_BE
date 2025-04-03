@@ -16,6 +16,7 @@ public class User {
     private String username;
     private String password;
     private String email;
+    private int score;
     private LocalDateTime createdAt;
 
     public User() {
@@ -26,6 +27,7 @@ public class User {
         this.username = username;
         this.password = password;
         this.email = email;
+        this.score = 0;
         this.createdAt = LocalDateTime.now();
     }
 }
