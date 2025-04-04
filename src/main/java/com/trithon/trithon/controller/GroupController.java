@@ -1,7 +1,7 @@
 package com.trithon.trithon.controller;
 
 import com.trithon.trithon.domain.Group;
-import com.trithon.trithon.domain.dto.GroupRequestDto;
+import com.trithon.trithon.domain.dto.request.GroupRequestDto;
 import com.trithon.trithon.service.GroupService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
