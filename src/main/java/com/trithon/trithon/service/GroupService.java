@@ -4,7 +4,7 @@ import com.google.cloud.storage.BlobId;
 import com.google.cloud.storage.BlobInfo;
 import com.google.cloud.storage.Storage;
 import com.trithon.trithon.domain.Group;
-import com.trithon.trithon.domain.dto.GroupRequestDto;
+import com.trithon.trithon.domain.dto.request.GroupRequestDto;
 import com.trithon.trithon.repository.GroupRepository;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;

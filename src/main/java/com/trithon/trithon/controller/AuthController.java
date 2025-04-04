@@ -1,6 +1,6 @@
 package com.trithon.trithon.controller;
 
-import com.trithon.trithon.domain.dto.AuthRequestDto;
+import com.trithon.trithon.domain.dto.request.AuthRequestDto;
 import com.trithon.trithon.service.AuthService;
 import org.springframework.web.bind.annotation.*;
 

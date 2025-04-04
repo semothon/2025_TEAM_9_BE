@@ -1,4 +1,4 @@
-package com.trithon.trithon.domain.dto;
+package com.trithon.trithon.domain.dto.request;
 
 import lombok.*;
 import org.springframework.web.multipart.MultipartFile;

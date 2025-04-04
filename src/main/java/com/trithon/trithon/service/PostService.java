@@ -4,7 +4,7 @@ import com.google.cloud.storage.BlobId;
 import com.google.cloud.storage.BlobInfo;
 import com.google.cloud.storage.Storage;
 import com.trithon.trithon.domain.Post;
-import com.trithon.trithon.domain.dto.PostRequestDto;
+import com.trithon.trithon.domain.dto.request.PostRequestDto;
 import com.trithon.trithon.repository.PostRepository;
 
 import org.springframework.beans.factory.annotation.Value;

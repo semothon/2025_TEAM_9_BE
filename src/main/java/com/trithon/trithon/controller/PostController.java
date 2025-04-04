@@ -1,7 +1,7 @@
 package com.trithon.trithon.controller;
 
 import com.trithon.trithon.domain.Post;
-import com.trithon.trithon.domain.dto.PostRequestDto;
+import com.trithon.trithon.domain.dto.request.PostRequestDto;
 import com.trithon.trithon.service.PostService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

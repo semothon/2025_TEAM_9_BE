@@ -1,4 +1,4 @@
-package com.trithon.trithon.domain.dto;
+package com.trithon.trithon.domain.dto.request;
 
 public class ResponseDto {
     private String message;
