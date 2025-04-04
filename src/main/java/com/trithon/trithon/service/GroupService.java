@@ -65,8 +65,16 @@ public class GroupService {
         return code;
     }
 
+    public List<Group> getGroupsByUserId(String userId) {
+        return groupRepository.findByMemberIdsContaining(userId);
+    }
+
     public Group getGroupById(String groupId) {
         return groupRepository.findById(groupId).get();
+    }
+
+    public Group getGroupByJoinCode(String joinCode) {
+        return groupRepository.findByJoinCode(joinCode).get();
     }
 
     public List<Group> getGroups() {

@@ -29,9 +29,19 @@ public class GroupController {
         return groupService.getGroups();
     }
 
-    @GetMapping("/{groupId}")
-    public Group getGroup(@PathVariable String groupId) {
+    @GetMapping("/userId/{userId}")
+    public List<Group> getGroupsByUserId(@PathVariable String userId) {
+        return groupService.getGroupsByUserId(userId);
+    }
+
+    @GetMapping("/groupId/{groupId}")
+    public Group getGroupById(@PathVariable String groupId) {
         return groupService.getGroupById(groupId);
+    }
+
+    @GetMapping("/joinCode/{joinCode}")
+    public Group getGroupByJoinCode(@PathVariable String joinCode) {
+        return groupService.getGroupByJoinCode(joinCode);
     }
 
     @PutMapping("/{groupId}/join/{userId}")
