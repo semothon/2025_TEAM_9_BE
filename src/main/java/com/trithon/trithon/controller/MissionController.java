@@ -3,10 +3,10 @@ package com.trithon.trithon.controller;
 import com.trithon.trithon.domain.DailyScore;
 import com.trithon.trithon.domain.ENUM.MissionType;
 import com.trithon.trithon.domain.Mission;
+import com.trithon.trithon.domain.TrendQuiz;
 import com.trithon.trithon.domain.dto.response.MissionResponseDto;
 import com.trithon.trithon.domain.dto.response.UserDailyRankingResponse;
 import com.trithon.trithon.service.MissionService;
-import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -46,6 +46,11 @@ public class MissionController {
                                   @RequestParam int index) {
         missionService.completeMission(userId, interviewId, stage, index);
         return "Mission completed successfully.";
+    }
+
+    @GetMapping("/trend-quiz/{interviewId}")
+    public TrendQuiz getTrendQuiz(@PathVariable String interviewId) {
+        return missionService.getQuizByInterviewCategory(interviewId);
     }
 
     @PostMapping("/score/{userId}/{interviewId}")

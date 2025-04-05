@@ -20,6 +20,7 @@ public class Attendance {
 
     private boolean oddMissionCompleted;
     private boolean evenMissionCompleted;
+    private boolean trendQuizCompleted;
 
     public Attendance(String userId, String interviewId, LocalDate date) {
         this.userId = userId;
@@ -27,9 +28,10 @@ public class Attendance {
         this.date = date;
         this.oddMissionCompleted = false;
         this.evenMissionCompleted = false;
+        this.trendQuizCompleted = false;
     }
 
     public boolean isAttendanceSatisfied() {
-        return oddMissionCompleted && evenMissionCompleted;
+        return oddMissionCompleted && evenMissionCompleted && trendQuizCompleted;
     }
 }

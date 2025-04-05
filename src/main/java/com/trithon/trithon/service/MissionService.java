@@ -5,14 +5,10 @@ import com.trithon.trithon.domain.ENUM.MissionType;
 import com.trithon.trithon.domain.dto.response.MissionResponseDto;
 import com.trithon.trithon.domain.dto.response.UserDailyRankingResponse;
 import com.trithon.trithon.repository.*;
-import org.springframework.cglib.core.Local;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -26,6 +22,7 @@ public class MissionService {
     private final DailyScoreRepository dailyScoreRepository;
     private final UserRepository userRepository;
     private final DailyMissionRepository dailyMissionRepository;
+    private final TrendQuizRepository trendQuizRepository;
 
     public MissionService(MissionRepository missionRepository,
                           MissionCompletionRepository missionCompletionRepository,
@@ -34,7 +31,8 @@ public class MissionService {
                           GroupRepository groupRepository,
                           DailyScoreRepository dailyScoreRepository,
                           UserRepository userRepository,
-                          DailyMissionRepository dailyMissionRepository) {
+                          DailyMissionRepository dailyMissionRepository,
+                          TrendQuizRepository trendQuizRepository) {
         this.missionRepository = missionRepository;
         this.missionCompletionRepository = missionCompletionRepository;
         this.attendanceRepository = attendanceRepository;
@@ -43,6 +41,7 @@ public class MissionService {
         this.dailyScoreRepository = dailyScoreRepository;
         this.userRepository = userRepository;
         this.dailyMissionRepository = dailyMissionRepository;
+        this.trendQuizRepository = trendQuizRepository;
     }
 
     public Mission getMission(int stage, int index) {
@@ -133,6 +132,20 @@ public class MissionService {
         String question = oddMission.getQuestion();
 
         return new MissionResponseDto(oddMission, evenMission, question);
+    }
+
+    public TrendQuiz getQuizByInterviewCategory(String interviewId) {
+        Interview interview = interviewRepository.findById(interviewId)
+                .orElseThrow(() -> new RuntimeException("Interview not found"));
+
+        List<TrendQuiz> quizzes = trendQuizRepository.findByCategory(interview.getCategory());
+
+        if (quizzes.isEmpty()) {
+            throw new RuntimeException("No trend quiz available for this category");
+        }
+
+        TrendQuiz quiz = quizzes.get(new Random().nextInt(quizzes.size()));
+        return quiz;
     }
 
     public void increaseScore(String userId, String interviewId, int points) {
