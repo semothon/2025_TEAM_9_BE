@@ -33,6 +33,11 @@ public class MissionController {
         return new MissionResponseDto(oddMission, evenMission, question);
     }
 
+    @GetMapping("/daily")
+    public MissionResponseDto getTodayMissions(@RequestParam String userId) {
+        return missionService.getTodayMissions(userId);
+    }
+
     // 특정 미션 완료
     @PostMapping("/complete")
     public String completeMission(@RequestParam String userId,

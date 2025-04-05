@@ -2,8 +2,10 @@ package com.trithon.trithon.service;
 
 import com.trithon.trithon.domain.*;
 import com.trithon.trithon.domain.ENUM.MissionType;
+import com.trithon.trithon.domain.dto.response.MissionResponseDto;
 import com.trithon.trithon.domain.dto.response.UserDailyRankingResponse;
 import com.trithon.trithon.repository.*;
+import org.springframework.cglib.core.Local;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -23,6 +25,7 @@ public class MissionService {
     private final GroupRepository groupRepository;
     private final DailyScoreRepository dailyScoreRepository;
     private final UserRepository userRepository;
+    private final DailyMissionRepository dailyMissionRepository;
 
     public MissionService(MissionRepository missionRepository,
                           MissionCompletionRepository missionCompletionRepository,
@@ -30,7 +33,8 @@ public class MissionService {
                           InterviewRepository interviewRepository,
                           GroupRepository groupRepository,
                           DailyScoreRepository dailyScoreRepository,
-                          UserRepository userRepository) {
+                          UserRepository userRepository,
+                          DailyMissionRepository dailyMissionRepository) {
         this.missionRepository = missionRepository;
         this.missionCompletionRepository = missionCompletionRepository;
         this.attendanceRepository = attendanceRepository;
@@ -38,6 +42,7 @@ public class MissionService {
         this.groupRepository = groupRepository;
         this.dailyScoreRepository = dailyScoreRepository;
         this.userRepository = userRepository;
+        this.dailyMissionRepository = dailyMissionRepository;
     }
 
     public Mission getMission(int stage, int index) {
@@ -197,5 +202,26 @@ public class MissionService {
         }
 
         return result;
+    }
+
+    public MissionResponseDto getTodayMissions(String userId) {
+        LocalDate today = LocalDate.now();
+
+        DailyMission dailyMission = dailyMissionRepository.findByUserIdAndDate(userId, today)
+                .orElseGet(() -> {
+                    Mission odd = getNextMissionByType(userId, MissionType.ODD);
+                    Mission even = getNextMissionByType(userId, MissionType.EVEN);
+
+                    DailyMission newMission = new DailyMission(userId, today, odd.getId(), even.getId());
+                    return dailyMissionRepository.save(newMission);
+                });
+
+        Mission oddMission = missionRepository.findById(dailyMission.getOddMissionId())
+                .orElseThrow(() -> new RuntimeException("Odd mission not found"));
+        Mission evenMission = missionRepository.findById(dailyMission.getEvenMissionId())
+                .orElseThrow(() -> new RuntimeException("Even mission not found"));
+        String question = oddMission.getQuestion();
+
+        return new MissionResponseDto(oddMission, evenMission, question);
     }
 }
