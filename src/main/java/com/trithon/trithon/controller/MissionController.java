@@ -4,7 +4,11 @@ import com.trithon.trithon.domain.ENUM.MissionType;
 import com.trithon.trithon.domain.Mission;
 import com.trithon.trithon.domain.dto.response.MissionResponseDto;
 import com.trithon.trithon.service.MissionService;
+import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.time.LocalDate;
 
 @RestController
 @RequestMapping("/missions")
@@ -33,5 +37,20 @@ public class MissionController {
                                   @RequestParam int index) {
         missionService.completeMission(userId, stage, index);
         return "Mission completed successfully.";
+    }
+
+    @PostMapping("/score/{userId}/{interviewId}")
+    public ResponseEntity<Void> increaseScore(
+            @PathVariable String userId,
+            @PathVariable String interviewId,
+            @RequestParam int points) {
+        missionService.increaseScore(userId, interviewId, points);
+        return ResponseEntity.ok().build();
+    }
+
+    @GetMapping("/score/{userId}")
+    public int getTodayScore(@PathVariable String userId) {
+        LocalDate date = LocalDate.now();
+        return missionService.getUserScoreByDate(userId, date);
     }
 }

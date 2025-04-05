@@ -24,6 +24,9 @@ public class Interview {
     private InterviewCategory category;
     private List<String> tags;
 
+    private int score;
+    private int level;
+
     private LocalDate date;
     private LocalTime time;
 
@@ -42,6 +45,8 @@ public class Interview {
         this.name = name;
         this.category = category;
         this.tags = tags;
+        this.score = 0;
+        this.level = 0;
         this.date = date;
         this.time = time;
         this.questDifficulty = questDifficulty;

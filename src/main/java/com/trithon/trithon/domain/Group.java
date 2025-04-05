@@ -21,6 +21,7 @@ public class Group {
     private List<String> tags;
     private String imageUrl;
     private int score;
+    private int level;
 
     public Group(String authorId, String name, String joinCode, List<String> tags, String imageUrl) {
         this.authorId = authorId;
@@ -31,5 +32,6 @@ public class Group {
         this.tags = tags;
         this.imageUrl = imageUrl;
         this.score = 0;
+        this.level = 0;
     }
 }

@@ -1,12 +1,8 @@
 package com.trithon.trithon.service;
 
-import com.trithon.trithon.domain.Attendance;
+import com.trithon.trithon.domain.*;
 import com.trithon.trithon.domain.ENUM.MissionType;
-import com.trithon.trithon.domain.Mission;
-import com.trithon.trithon.domain.MissionCompletion;
-import com.trithon.trithon.repository.AttendanceRepository;
-import com.trithon.trithon.repository.MissionCompletionRepository;
-import com.trithon.trithon.repository.MissionRepository;
+import com.trithon.trithon.repository.*;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -19,13 +15,22 @@ public class MissionService {
     private final MissionRepository missionRepository;
     private final MissionCompletionRepository missionCompletionRepository;
     private final AttendanceRepository attendanceRepository;
+    private final InterviewRepository interviewRepository;
+    private final GroupRepository groupRepository;
+    private final DailyScoreRepository dailyScoreRepository;
 
     public MissionService(MissionRepository missionRepository,
                           MissionCompletionRepository missionCompletionRepository,
-                          AttendanceRepository attendanceRepository) {
+                          AttendanceRepository attendanceRepository,
+                          InterviewRepository interviewRepository,
+                          GroupRepository groupRepository,
+                          DailyScoreRepository dailyScoreRepository) {
         this.missionRepository = missionRepository;
         this.missionCompletionRepository = missionCompletionRepository;
         this.attendanceRepository = attendanceRepository;
+        this.interviewRepository = interviewRepository;
+        this.groupRepository = groupRepository;
+        this.dailyScoreRepository = dailyScoreRepository;
     }
 
     public Mission getMission(int stage, int index) {
@@ -75,27 +80,6 @@ public class MissionService {
         return oddMissions.get((int)(Math.random() * oddMissions.size())).getQuestion();
     }
 
-    public Mission getNextOddMission(String userId) {
-        List<Mission> oddMissions = missionRepository.findByType(MissionType.ODD);
-        List<MissionCompletion> completions = missionCompletionRepository.findByUserId(userId);
-
-        List<String> completedIds = completions.stream()
-                .map(MissionCompletion::getMissionId)
-                .toList();
-
-        return oddMissions.stream()
-                .filter(m -> !completedIds.contains(m.getId()))
-                .sorted((a, b) -> {
-                    if (a.getStage() == b.getStage()) {
-                        return Integer.compare(a.getIndex(), b.getIndex());
-                    } else {
-                        return Integer.compare(a.getStage(), b.getStage());
-                    }
-                })
-                .findFirst()
-                .orElse(null);
-    }
-
     public Mission getNextMissionByType(String userId, MissionType type) {
         List<Mission> missions = missionRepository.findByType(type);
         List<MissionCompletion> completions = missionCompletionRepository.findByUserId(userId);
@@ -115,5 +99,42 @@ public class MissionService {
                 })
                 .findFirst()
                 .orElse(null);
+    }
+
+    public void increaseScore(String userId, String interviewId, int points) {
+        Interview interview = interviewRepository.findById(interviewId)
+                .orElseThrow(() -> new RuntimeException("Interview not found"));
+
+        int newScore = interview.getScore() + points;
+        interview.setScore(newScore);
+        interview.setLevel(calculateLevel(newScore));
+        interviewRepository.save(interview);
+
+        List<Group> userGroups = groupRepository.findByMemberIdsContaining(userId);
+        for (Group group : userGroups) {
+            int newGroupScore = group.getScore() + points;
+            group.setScore(newGroupScore);
+            group.setLevel(calculateLevel(newGroupScore));
+            groupRepository.save(group);
+        }
+
+        DailyScore todayScore = dailyScoreRepository.findByUserIdAndDate(userId, LocalDate.now())
+                .orElse(new DailyScore(userId, LocalDate.now()));
+        todayScore.setScore(todayScore.getScore() + points);
+        dailyScoreRepository.save(todayScore);
+    }
+
+    public int calculateLevel(int score) {
+        if (score >= 300) return 4;
+        if (score >= 200) return 3;
+        if (score >= 100) return 2;
+        if (score >= 50) return 1;
+        return 0;
+    }
+
+    public int getUserScoreByDate(String userId, LocalDate date) {
+        return dailyScoreRepository.findByUserIdAndDate(userId, date)
+                .map(DailyScore::getScore)
+                .orElse(0);
     }
 }
