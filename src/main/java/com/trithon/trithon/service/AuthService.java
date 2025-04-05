@@ -58,6 +58,11 @@ public class AuthService {
         return userRepository.findAll();
     }
 
+    public User getUserById(String id) {
+        return userRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("User not found with id: " + id));
+    }
+
     public User getUserByName(String name) {
         return userRepository.findByUsername(name).get();
     }
