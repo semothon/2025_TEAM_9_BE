@@ -15,12 +15,14 @@ public class MissionCompletion {
     private String id;
 
     private String userId;
+    private String interviewId;
     private String missionId;
     private boolean completed;
     private LocalDate date;
 
-    public MissionCompletion(String userId, String missionId, boolean completed, LocalDate date) {
+    public MissionCompletion(String userId, String interviewId, String missionId, boolean completed, LocalDate date) {
         this.userId = userId;
+        this.interviewId = interviewId;
         this.missionId = missionId;
         this.completed = completed;
         this.date = date;

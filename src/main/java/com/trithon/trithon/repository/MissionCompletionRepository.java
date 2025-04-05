@@ -8,6 +8,6 @@ import java.util.List;
 import java.util.Optional;
 
 public interface MissionCompletionRepository extends MongoRepository<MissionCompletion, String> {
-    Optional<MissionCompletion> findByUserIdAndMissionIdAndDate(String userId, String missionId, LocalDate date);
-    List<MissionCompletion> findByUserId(String userId);
+    Optional<MissionCompletion> findByUserIdAndInterviewIdAndMissionIdAndDate(String userId, String interviewId, String missionId, LocalDate date);
+    List<MissionCompletion> findByUserIdAndInterviewId(String userId, String interviewId);
 }

@@ -50,22 +50,22 @@ public class MissionService {
                 .orElseThrow(() -> new RuntimeException("Mission not found"));
     }
 
-    public void completeMission(String userId, int stage, int index) {
+    public void completeMission(String userId, String interviewId, int stage, int index) {
         Mission mission = getMission(stage, index);
         String missionId = mission.getId();
         LocalDate today = LocalDate.now();
 
         // 이미 완료한 경우 중복 저장 방지
-        Optional<MissionCompletion> existingCompletion = missionCompletionRepository.findByUserIdAndMissionIdAndDate(userId, missionId, today);
+        Optional<MissionCompletion> existingCompletion = missionCompletionRepository.findByUserIdAndInterviewIdAndMissionIdAndDate(userId, interviewId, missionId, today);
         if (existingCompletion.isPresent()) return;
 
         // MissionCompletion 저장
-        MissionCompletion completion = new MissionCompletion(userId, missionId, true, today);
+        MissionCompletion completion = new MissionCompletion(userId, interviewId, missionId, true, today);
         missionCompletionRepository.save(completion);
 
         // Attendance 업데이트
-        Attendance attendance = attendanceRepository.findByUserIdAndDate(userId, today)
-                .orElseGet(() -> new Attendance(userId, today));
+        Attendance attendance = attendanceRepository.findByUserIdAndInterviewIdAndDate(userId, interviewId, today)
+                .orElseGet(() -> new Attendance(userId, interviewId, today));
 
         if (mission.getType() == MissionType.ODD) {
             attendance.setOddMissionCompleted(true);
@@ -76,8 +76,8 @@ public class MissionService {
         attendanceRepository.save(attendance);
     }
 
-    public String getRandomQuestion(String userId) {
-        List<MissionCompletion> completions = missionCompletionRepository.findByUserId(userId);
+    public String getRandomQuestion(String userId, String interviewId) {
+        List<MissionCompletion> completions = missionCompletionRepository.findByUserIdAndInterviewId(userId, interviewId);
         List<String> completedMissionIds = completions.stream()
                 .filter(MissionCompletion::isCompleted)
                 .map(MissionCompletion::getMissionId)
@@ -92,11 +92,12 @@ public class MissionService {
         return oddMissions.get((int)(Math.random() * oddMissions.size())).getQuestion();
     }
 
-    public Mission getNextMissionByType(String userId, MissionType type) {
+    public Mission getNextMissionByType(String userId, String interviewId, MissionType type) {
         List<Mission> missions = missionRepository.findByType(type);
-        List<MissionCompletion> completions = missionCompletionRepository.findByUserId(userId);
+        List<MissionCompletion> completions = missionCompletionRepository.findByUserIdAndInterviewId(userId, interviewId);
 
         List<String> completedIds = completions.stream()
+                .filter(MissionCompletion::isCompleted)
                 .map(MissionCompletion::getMissionId)
                 .toList();
 
@@ -111,6 +112,27 @@ public class MissionService {
                 })
                 .findFirst()
                 .orElse(null);
+    }
+
+    public MissionResponseDto getTodayMissions(String userId, String interviewId) {
+        LocalDate today = LocalDate.now();
+
+        DailyMission dailyMission = dailyMissionRepository.findByUserIdAndInterviewIdAndDate(userId, interviewId, today)
+                .orElseGet(() -> {
+                    Mission odd = getNextMissionByType(userId, interviewId, MissionType.ODD);
+                    Mission even = getNextMissionByType(userId, interviewId, MissionType.EVEN);
+
+                    DailyMission newMission = new DailyMission(userId, interviewId, today, odd.getId(), even.getId());
+                    return dailyMissionRepository.save(newMission);
+                });
+
+        Mission oddMission = missionRepository.findById(dailyMission.getOddMissionId())
+                .orElseThrow(() -> new RuntimeException("Odd mission not found"));
+        Mission evenMission = missionRepository.findById(dailyMission.getEvenMissionId())
+                .orElseThrow(() -> new RuntimeException("Even mission not found"));
+        String question = oddMission.getQuestion();
+
+        return new MissionResponseDto(oddMission, evenMission, question);
     }
 
     public void increaseScore(String userId, String interviewId, int points) {
@@ -202,26 +224,5 @@ public class MissionService {
         }
 
         return result;
-    }
-
-    public MissionResponseDto getTodayMissions(String userId) {
-        LocalDate today = LocalDate.now();
-
-        DailyMission dailyMission = dailyMissionRepository.findByUserIdAndDate(userId, today)
-                .orElseGet(() -> {
-                    Mission odd = getNextMissionByType(userId, MissionType.ODD);
-                    Mission even = getNextMissionByType(userId, MissionType.EVEN);
-
-                    DailyMission newMission = new DailyMission(userId, today, odd.getId(), even.getId());
-                    return dailyMissionRepository.save(newMission);
-                });
-
-        Mission oddMission = missionRepository.findById(dailyMission.getOddMissionId())
-                .orElseThrow(() -> new RuntimeException("Odd mission not found"));
-        Mission evenMission = missionRepository.findById(dailyMission.getEvenMissionId())
-                .orElseThrow(() -> new RuntimeException("Even mission not found"));
-        String question = oddMission.getQuestion();
-
-        return new MissionResponseDto(oddMission, evenMission, question);
     }
 }

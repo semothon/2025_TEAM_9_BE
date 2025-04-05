@@ -9,5 +9,6 @@ import java.util.Optional;
 
 public interface AttendanceRepository extends MongoRepository<Attendance, String> {
     Optional<Attendance> findByUserIdAndDate(String userId, LocalDate date);
-    List<Attendance> findByUserId(String userId);
+    Optional<Attendance> findByUserIdAndInterviewIdAndDate(String userId, String interviewId, LocalDate date);
+    List<Attendance> findByUserIdAndInterviewId(String userId, String interviewId);
 }

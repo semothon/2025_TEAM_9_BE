@@ -13,13 +13,15 @@ public class DailyMission {
     private String id;
 
     private String userId;
+    private String interviewId;
     private LocalDate date;
 
     private String oddMissionId;
     private String evenMissionId;
 
-    public DailyMission(String userId, LocalDate date, String oddMissionId, String evenMissionId) {
+    public DailyMission(String userId, String interviewId, LocalDate date, String oddMissionId, String evenMissionId) {
         this.userId = userId;
+        this.interviewId = interviewId;
         this.date = date;
         this.oddMissionId = oddMissionId;
         this.evenMissionId = evenMissionId;

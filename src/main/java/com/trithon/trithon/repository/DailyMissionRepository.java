@@ -7,5 +7,5 @@ import java.time.LocalDate;
 import java.util.Optional;
 
 public interface DailyMissionRepository extends MongoRepository<DailyMission, String> {
-    Optional<DailyMission> findByUserIdAndDate(String userId, LocalDate date);
+    Optional<DailyMission> findByUserIdAndInterviewIdAndDate(String userId, String interviewId, LocalDate date);
 }

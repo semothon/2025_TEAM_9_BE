@@ -16,13 +16,13 @@ public class AttendanceService {
         this.attendanceRepository = attendanceRepository;
     }
 
-    public boolean isAttendanceCompletedToday(String userId) {
-        return attendanceRepository.findByUserIdAndDate(userId, LocalDate.now())
+    public boolean isAttendanceCompletedToday(String userId, String interviewId) {
+        return attendanceRepository.findByUserIdAndInterviewIdAndDate(userId, interviewId, LocalDate.now())
                 .map(Attendance::isAttendanceSatisfied)
                 .orElse(false);
     }
 
-    public List<Attendance> getAttendanceHistory(String userId) {
-        return attendanceRepository.findByUserId(userId);
+    public List<Attendance> getAttendanceHistory(String userId, String interviewId) {
+        return attendanceRepository.findByUserIdAndInterviewId(userId, interviewId);
     }
 }
