@@ -17,13 +17,13 @@ public class AttendanceController {
     }
 
     @GetMapping("/today")
-    public boolean checkTodayAttendance(@RequestParam String userId) {
-        return attendanceService.isAttendanceCompletedToday(userId);
+    public boolean checkTodayAttendance(@RequestParam String userId, @RequestParam String interviewId) {
+        return attendanceService.isAttendanceCompletedToday(userId, interviewId);
     }
 
     // 출석 기록 전체 조회
     @GetMapping("/history")
-    public List<Attendance> getAttendanceHistory(@RequestParam String userId) {
-        return attendanceService.getAttendanceHistory(userId);
+    public List<Attendance> getAttendanceHistory(@RequestParam String userId, @RequestParam String interviewId) {
+        return attendanceService.getAttendanceHistory(userId, interviewId);
     }
 }

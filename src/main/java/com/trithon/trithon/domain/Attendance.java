@@ -15,13 +15,15 @@ public class Attendance {
     private String id;
 
     private String userId;
+    private String interviewId;
     private LocalDate date;
 
     private boolean oddMissionCompleted;
     private boolean evenMissionCompleted;
 
-    public Attendance(String userId, LocalDate date) {
+    public Attendance(String userId, String interviewId, LocalDate date) {
         this.userId = userId;
+        this.interviewId = interviewId;
         this.date = date;
         this.oddMissionCompleted = false;
         this.evenMissionCompleted = false;

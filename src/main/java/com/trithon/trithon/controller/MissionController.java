@@ -25,25 +25,26 @@ public class MissionController {
 
     // ODD & EVEN 미션 한 번에 조회
     @GetMapping("/next")
-    public MissionResponseDto getNextMissions(@RequestParam String userId) {
-        Mission oddMission = missionService.getNextMissionByType(userId, MissionType.ODD);
-        Mission evenMission = missionService.getNextMissionByType(userId, MissionType.EVEN);
-        String question = missionService.getRandomQuestion(userId);
+    public MissionResponseDto getNextMissions(@RequestParam String userId, @RequestParam String interviewId) {
+        Mission oddMission = missionService.getNextMissionByType(userId, interviewId, MissionType.ODD);
+        Mission evenMission = missionService.getNextMissionByType(userId, interviewId, MissionType.EVEN);
+        String question = missionService.getRandomQuestion(userId, interviewId);
 
         return new MissionResponseDto(oddMission, evenMission, question);
     }
 
     @GetMapping("/daily")
-    public MissionResponseDto getTodayMissions(@RequestParam String userId) {
-        return missionService.getTodayMissions(userId);
+    public MissionResponseDto getTodayMissions(@RequestParam String userId, @RequestParam String interviewId) {
+        return missionService.getTodayMissions(userId, interviewId);
     }
 
     // 특정 미션 완료
     @PostMapping("/complete")
     public String completeMission(@RequestParam String userId,
+                                  @RequestParam String interviewId,
                                   @RequestParam int stage,
                                   @RequestParam int index) {
-        missionService.completeMission(userId, stage, index);
+        missionService.completeMission(userId, interviewId, stage, index);
         return "Mission completed successfully.";
     }
 
