@@ -134,6 +134,17 @@ public class MissionService {
         return new MissionResponseDto(oddMission, evenMission, question);
     }
 
+    public void completeTrendQuiz(String userId, String interviewId) {
+        LocalDate today = LocalDate.now();
+
+        // Attendance 업데이트
+        Attendance attendance = attendanceRepository.findByUserIdAndInterviewIdAndDate(userId, interviewId, today)
+                .orElseGet(() -> new Attendance(userId, interviewId, today));
+
+        attendance.setTrendQuizCompleted(true);
+        attendanceRepository.save(attendance);
+    }
+
     public TrendQuiz getQuizByInterviewCategory(String interviewId) {
         Interview interview = interviewRepository.findById(interviewId)
                 .orElseThrow(() -> new RuntimeException("Interview not found"));

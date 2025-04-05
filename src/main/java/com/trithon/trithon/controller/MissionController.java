@@ -53,6 +53,13 @@ public class MissionController {
         return missionService.getQuizByInterviewCategory(interviewId);
     }
 
+    @PostMapping("/trend-quiz")
+    public String completeTrendQuiz(@RequestParam String userId,
+                                    @RequestParam String interviewId) {
+        missionService.completeTrendQuiz(userId, interviewId);
+        return "Trend quiz completed successfully.";
+    }
+
     @PostMapping("/score/{userId}/{interviewId}")
     public ResponseEntity<Void> increaseScore(
             @PathVariable String userId,
