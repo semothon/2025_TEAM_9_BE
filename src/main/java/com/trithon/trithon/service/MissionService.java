@@ -2,12 +2,16 @@ package com.trithon.trithon.service;
 
 import com.trithon.trithon.domain.*;
 import com.trithon.trithon.domain.ENUM.MissionType;
+import com.trithon.trithon.domain.dto.response.UserDailyRankingResponse;
 import com.trithon.trithon.repository.*;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class MissionService {
@@ -18,19 +22,22 @@ public class MissionService {
     private final InterviewRepository interviewRepository;
     private final GroupRepository groupRepository;
     private final DailyScoreRepository dailyScoreRepository;
+    private final UserRepository userRepository;
 
     public MissionService(MissionRepository missionRepository,
                           MissionCompletionRepository missionCompletionRepository,
                           AttendanceRepository attendanceRepository,
                           InterviewRepository interviewRepository,
                           GroupRepository groupRepository,
-                          DailyScoreRepository dailyScoreRepository) {
+                          DailyScoreRepository dailyScoreRepository,
+                          UserRepository userRepository) {
         this.missionRepository = missionRepository;
         this.missionCompletionRepository = missionCompletionRepository;
         this.attendanceRepository = attendanceRepository;
         this.interviewRepository = interviewRepository;
         this.groupRepository = groupRepository;
         this.dailyScoreRepository = dailyScoreRepository;
+        this.userRepository = userRepository;
     }
 
     public Mission getMission(int stage, int index) {
@@ -136,5 +143,59 @@ public class MissionService {
         return dailyScoreRepository.findByUserIdAndDate(userId, date)
                 .map(DailyScore::getScore)
                 .orElse(0);
+    }
+
+    public List<DailyScore> getTodayScoresByGroup(String groupId) {
+        Group group = groupRepository.findById(groupId)
+                .orElseThrow(() -> new RuntimeException("Group not found"));
+
+        LocalDate today = LocalDate.now();
+        List<String> memberIds = group.getMemberIds();
+
+        return dailyScoreRepository.findByUserIdInAndDate(memberIds, today);
+    }
+
+    public List<UserDailyRankingResponse> getTodayRankingByGroup(String groupId) {
+        Group group = groupRepository.findById(groupId)
+                .orElseThrow(() -> new RuntimeException("Group not found"));
+
+        LocalDate today = LocalDate.now();
+        List<String> memberIds = group.getMemberIds();
+
+        // 유저 정보 불러오기
+        Map<String, User> userMap = userRepository.findAllById(memberIds).stream()
+                .collect(Collectors.toMap(User::getId, user -> user));
+
+        // 오늘 점수 불러오기
+        Map<String, Integer> scoreMap = dailyScoreRepository.findByUserIdInAndDate(memberIds, today).stream()
+                .collect(Collectors.toMap(DailyScore::getUserId, DailyScore::getScore));
+
+        // 모든 멤버에 대해 점수 채워넣기 (없으면 0점)
+        List<Map.Entry<String, Integer>> sortedEntries = memberIds.stream()
+                .map(userId -> Map.entry(userId, scoreMap.getOrDefault(userId, 0)))
+                .sorted((a, b) -> Integer.compare(b.getValue(), a.getValue())) // 내림차순 정렬
+                .collect(Collectors.toList());
+
+        // 랭킹 처리 (동점 순위 유지)
+        List<UserDailyRankingResponse> result = new ArrayList<>();
+        int rank = 1;
+        int prevScore = -1;
+        int actualRank = 1;
+
+        for (int i = 0; i < sortedEntries.size(); i++) {
+            String userId = sortedEntries.get(i).getKey();
+            int score = sortedEntries.get(i).getValue();
+
+            if (score != prevScore) {
+                rank = actualRank;
+                prevScore = score;
+            }
+
+            User user = userMap.get(userId);
+            result.add(new UserDailyRankingResponse(user.getId(), user.getUsername(), score, rank));
+            actualRank++;
+        }
+
+        return result;
     }
 }

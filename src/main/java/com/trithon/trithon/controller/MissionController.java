@@ -1,14 +1,17 @@
 package com.trithon.trithon.controller;
 
+import com.trithon.trithon.domain.DailyScore;
 import com.trithon.trithon.domain.ENUM.MissionType;
 import com.trithon.trithon.domain.Mission;
 import com.trithon.trithon.domain.dto.response.MissionResponseDto;
+import com.trithon.trithon.domain.dto.response.UserDailyRankingResponse;
 import com.trithon.trithon.service.MissionService;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
+import java.util.List;
 
 @RestController
 @RequestMapping("/missions")
@@ -52,5 +55,17 @@ public class MissionController {
     public int getTodayScore(@PathVariable String userId) {
         LocalDate date = LocalDate.now();
         return missionService.getUserScoreByDate(userId, date);
+    }
+
+    @GetMapping("/score/{groupId}/daily-scores")
+    public ResponseEntity<List<DailyScore>> getGroupMembersTodayScores(@PathVariable String groupId) {
+        List<DailyScore> scores = missionService.getTodayScoresByGroup(groupId);
+        return ResponseEntity.ok(scores);
+    }
+
+    @GetMapping("/groups/{groupId}/daily-ranking")
+    public ResponseEntity<List<UserDailyRankingResponse>> getGroupDailyRanking(@PathVariable String groupId) {
+        List<UserDailyRankingResponse> ranking = missionService.getTodayRankingByGroup(groupId);
+        return ResponseEntity.ok(ranking);
     }
 }
