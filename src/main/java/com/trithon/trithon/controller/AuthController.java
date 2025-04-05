@@ -32,7 +32,12 @@ public class AuthController {
         return authService.getUsers();
     }
 
-    @GetMapping("/users/{userName}")
+    @GetMapping("/users/{userId}/id")
+    public User getUserById(@PathVariable String userId) {
+        return authService.getUserById(userId);
+    }
+
+    @GetMapping("/users/{userName}/name")
     public User getUserByName(@PathVariable String userName) {
         return authService.getUserByName(userName);
     }

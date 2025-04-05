@@ -3,7 +3,7 @@ package com.trithon.trithon.controller;
 import com.trithon.trithon.domain.DailyScore;
 import com.trithon.trithon.domain.ENUM.MissionType;
 import com.trithon.trithon.domain.Mission;
-import com.trithon.trithon.domain.TrendQuiz;
+//import com.trithon.trithon.domain.TrendQuiz;
 import com.trithon.trithon.domain.dto.response.MissionResponseDto;
 import com.trithon.trithon.domain.dto.response.UserDailyRankingResponse;
 import com.trithon.trithon.service.MissionService;
@@ -48,17 +48,17 @@ public class MissionController {
         return "Mission completed successfully.";
     }
 
-    @GetMapping("/trend-quiz/{interviewId}")
-    public TrendQuiz getTrendQuiz(@PathVariable String interviewId) {
-        return missionService.getQuizByInterviewCategory(interviewId);
-    }
+//    @GetMapping("/trend-quiz/{interviewId}")
+//    public TrendQuiz getTrendQuiz(@PathVariable String interviewId) {
+//        return missionService.getQuizByInterviewCategory(interviewId);
+//    }
 
-    @PostMapping("/trend-quiz")
-    public String completeTrendQuiz(@RequestParam String userId,
-                                    @RequestParam String interviewId) {
-        missionService.completeTrendQuiz(userId, interviewId);
-        return "Trend quiz completed successfully.";
-    }
+//    @PostMapping("/trend-quiz")
+//    public String completeTrendQuiz(@RequestParam String userId,
+//                                    @RequestParam String interviewId) {
+//        missionService.completeTrendQuiz(userId, interviewId);
+//        return "Trend quiz completed successfully.";
+//    }
 
     @PostMapping("/score/{userId}/{interviewId}")
     public ResponseEntity<Void> increaseScore(
